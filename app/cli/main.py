@@ -26,10 +26,12 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "ingest":
-        logger.info("Running ingest (rebuild=%s)", getattr(args, "rebuild", False))
-        ingest_main()
+        rebuild = getattr(args, "rebuild", False)
+        logger.info("Running ingest (rebuild={})", rebuild)
+        ingest_main(rebuild=rebuild)
     else:
         parser.print_help()
+
 
 
 if __name__ == "__main__":

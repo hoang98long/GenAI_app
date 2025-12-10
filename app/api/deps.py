@@ -1,45 +1,43 @@
 # app/api/deps.py
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, List
 
 from fastapi import Depends, Header, HTTPException, status
 
 from app.config import Settings, get_settings
+from llm.pipelines.rag_qa import RAGChatResult, get_rag_pipeline
 
 
 @dataclass
 class ChatAnswer:
     answer: str
-    sources: list[dict[str, Any]]
+    sources: List[dict[str, Any]]
 
 
-class DummyRAGService:
+class RAGService:
     """
-    Service tạm thời: trả lời cứng.
-    Sau này ta sẽ thay bằng RAG pipeline thật từ module `llm/`.
+    Service production: dùng RAGPipeline thực tế.
     """
+
+    def __init__(self):
+        self.pipeline = get_rag_pipeline()
 
     def chat(self, question: str, session_id: str | None = None, top_k: int = 5) -> ChatAnswer:
-        return ChatAnswer(
-            answer=(
-                "Xin chào! Đây là câu trả lời demo. "
-                "Pipeline RAG thực tế sẽ được tích hợp ở bước sau."
-            ),
-            sources=[],
-        )
+        # TODO: session_id có thể dùng để lưu context hội thoại sau này
+        result: RAGChatResult = self.pipeline.chat(question=question, top_k=top_k)
+        return ChatAnswer(answer=result.answer, sources=result.sources)
 
 
-def get_rag_service(settings: Settings = Depends(get_settings)) -> DummyRAGService:
-    # Sau này có thể dùng settings để chọn provider, model, vector store…
-    return DummyRAGService()
+def get_rag_service(settings: Settings = Depends(get_settings)) -> RAGService:
+    # settings hiện chưa dùng nhiều, nhưng sau này có thể dùng để chọn pipeline
+    return RAGService()
 
 
 def verify_api_key(
     x_api_key: str | None = Header(default=None),
     settings: Settings = Depends(get_settings),
 ) -> None:
-    """Simple header-based API key auth."""
     if settings.api_key and x_api_key != settings.api_key:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
