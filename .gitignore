@@ -1,0 +1,44 @@
+/.idea
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+.envrc
+
+# Environment variables
+.env
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# VSCode / IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs
+logs/
+*.log
+
+# Data (tuỳ chọn: có thể commit một số file nhỏ trong data/raw)
+data/vectorstores/
+data/processed/
+data/cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+docker/*.log
+
